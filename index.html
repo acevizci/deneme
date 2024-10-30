@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İkili Sidebar</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- İlk Sidebar (Chart Seçenekleri) -->
+<div id="chart-sidebar">
+    <h2 style="text-align:center;">Charts</h2>
+    <div class="menu-options">
+        <div onclick="selectChartType('line')" aria-label="Çizgi Grafiğini Seç" role="button">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/line-chart.png" alt="Çizgi Grafiği">
+            <span>ÇİZGİ</span>
+        </div>
+        <div onclick="selectChartType('area')" aria-label="Alan Grafiğini Seç" role="button">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/area-chart.png" alt="Alan Grafiği">
+            <span>ALAN</span>
+        </div>
+        <div onclick="selectChartType('bar')" aria-label="Sütun Grafiğini Seç" role="button">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/bar-chart.png" alt="Sütun Grafiği">
+            <span>SÜTUN</span>
+        </div>
+    </div>
+</div>
+
+<!-- İkinci Sidebar (Iconlar) -->
+<div id="icon-sidebar">
+    <div class="icon" data-section="data" onclick="showSettings('data')">📊</div>
+    <div class="icon" data-section="theme" onclick="showSettings('theme')">🎨</div>
+    <div class="icon" data-section="axes" onclick="showSettings('axes')">📏</div>
+    <div class="icon" data-section="fonts" onclick="showSettings('fonts')">🔤</div>
+    <div class="icon" data-section="options" onclick="showSettings('options')">⚙️</div>
+    <button id="back-button" onclick="resetView()">Geri Dön</button>
+</div>
+
+<!-- Üçüncü Sidebar (Ayarlar) -->
+<div id="settings-sidebar">
+    <!-- Veri Seçenekleri -->
+    <ul id="data" class="sidebar-content">
+        <li><a href="#">Veri Seçeneği 1</a></li>
+        <li><a href="#">Veri Seçeneği 2</a></li>
+        <li><a href="#">Veri Seçeneği 3</a></li>
+    </ul>
+
+    <!-- Tema Ayarları -->
+    <ul id="theme" class="sidebar-content" style="display:none;">
+        <div class="theme-settings">
+            <h2>Grafik Teması</h2>
+
+            <!-- Gündüz/Gece Modu -->
+            <div class="mode-toggle">
+                <span>Mod</span>
+                <div class="mode-buttons">
+                    <button id="day-mode" class="mode-btn active">🌞</button>
+                    <button id="night-mode" class="mode-btn">🌜</button>
+                </div>
+            </div>
+
+            <!-- Renk Ayarları -->
+            <div class="color-settings">
+                <label for="chart-bg-color">Grafik Arka Plan Rengi</label>
+                <input type="color" id="chart-bg-color">
+                
+                <label for="chart-text-color">Grafik Metin Rengi</label>
+                <input type="color" id="chart-text-color">
+            </div>
+
+            <!-- Tema ve Renk Paleti Seçimi -->
+            <div class="theme-selector">
+                <label for="theme-palette">Select a Predefined Theme</label>
+                <div class="dropdown">
+                    <div class="selected-theme" id="selected-theme">palette1</div>
+                    <div class="palette-options">
+                        <div class="palette" data-palette="palette1">
+                            <div class="color-box" style="background-color: #008FFB;"></div>
+                            <div class="color-box" style="background-color: #00E396;"></div>
+                            <div class="color-box" style="background-color: #FEB019;"></div>
+                            <div class="color-box" style="background-color: #FF4560;"></div>
+                        </div>
+                        <div class="palette" data-palette="palette2">
+                            <div class="color-box" style="background-color: #775DD0;"></div>
+                            <div class="color-box" style="background-color: #00E396;"></div>
+                            <div class="color-box" style="background-color: #008FFB;"></div>
+                            <div class="color-box" style="background-color: #FEB019;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gölge Ayarları -->
+            <h3>Gölge</h3>
+            <div class="drop-shadow">
+                <div class="toggle-shadow">
+                    <label>Etkinleştir</label>
+                    <input type="checkbox" id="enable-shadow">
+                </div>
+                <label>Blur</label>
+                <input type="range" id="shadow-blur" min="0" max="10">
+                
+                <label>Offset X</label>
+                <input type="range" id="shadow-offset-x" min="-10" max="10">
+                
+                <label>Offset Y</label>
+                <input type="range" id="shadow-offset-y" min="-10" max="10">
+                
+                <label>Gölge Rengi</label>
+                <input type="color" id="shadow-color">
+                
+                <label>Gölge Opaklığı</label>
+                <input type="range" id="shadow-opacity" min="0" max="1" step="0.1">
+            </div>
+        </div>
+    </ul>
+
+    <!-- X ve Y Eksen Ayarları -->
+    <ul id="axes" class="sidebar-content">
+        <div class="axis-settings">
+            <h3 class="accordion-header" onclick="toggleAccordion(this)">X-Axis</h3>
+            <div class="accordion-content">
+                <div class="axis-option">
+                    <label for="x-axis-type">Type</label>
+                    <select id="x-axis-type">
+                        <option value="category">category</option>
+                        <option value="datetime">datetime</option>
+                    </select>
+                </div>
+                <div class="axis-option">
+                    <label for="x-axis-position">Position</label>
+                    <select id="x-axis-position">
+                        <option value="bottom">bottom</option>
+                        <option value="top">top</option>
+                    </select>
+                </div>
+                <div class="axis-option">
+                    <label>X-axis Top Offset</label>
+                    <input type="range" id="x-axis-offset" min="0" max="100" value="0">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="offset-display">0</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-settings">
+                    <h4 class="accordion-header" onclick="toggleAccordion(this)">X-axis Labels</h4>
+                    <div class="accordion-content scrollable-content">
+                        <div class="axis-option toggle-option">
+                            <label>Show labels</label>
+                            <label class="switch">
+                                <input type="checkbox" id="show-labels" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="axis-option">
+                            <label for="formatter">Formatter</label>
+                            <input type="text" id="formatter" placeholder="Custom Formatter" disabled>
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Labels Color</label>
+                            <input type="color" id="labels-color">
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Font Size</label>
+                            <input type="range" id="font-size" min="8" max="30" value="12">
+                            <div class="offset-value">
+                                <button class="decrement" data-target="font-size">-</button>
+                                <span id="font-size-value">12</span>
+                                <button class="increment" data-target="font-size">+</button>
+                            </div>
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Font Weight</label>
+                            <input type="range" id="font-weight" min="100" max="900" step="100" value="400">
+                        </div>
+
+                        <div class="axis-option toggle-option">
+                            <label>Rotate</label>
+                            <label class="switch">
+                                <input type="checkbox" id="rotate">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Rotation Angle</label>
+                            <input type="range" id="rotation-angle" min="-90" max="90" value="-45">
+                            <div class="offset-value">
+                                <button class="decrement" data-target="rotation-angle">-</button>
+                                <span id="rotation-angle-value">-45</span>
+                                <button class="increment" data-target="rotation-angle">+</button>
+                            </div>
+                        </div>
+
+                        <div class="axis-option toggle-option">
+                            <label>Trim long labels</label>
+                            <label class="switch">
+                                <input type="checkbox" id="trim-labels" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Labels Left Offset</label>
+                            <input type="range" id="labels-left-offset" min="0" max="100" value="0">
+                            <div class="offset-value">
+                                <button class="decrement" data-target="labels-left-offset">-</button>
+                                <span id="labels-left-offset-value">0</span>
+                                <button class="increment" data-target="labels-left-offset">+</button>
+                            </div>
+                        </div>
+
+                        <div class="axis-option">
+                            <label>Labels Top Offset</label>
+                            <input type="range" id="labels-top-offset" min="0" max="100" value="0">
+                            <div class="offset-value">
+                                <button class="decrement" data-target="labels-top-offset">-</button>
+                                <span id="labels-top-offset-value">0</span>
+                                <button class="increment" data-target="labels-top-offset">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="axis-expand">X-axis Title</button>
+                <button class="axis-expand">Axis Ticks</button>
+                <button class="axis-expand">Axis Border</button>
+            </div>
+        </div>
+
+        <div class="axis-settings">
+            <h3 class="accordion-header" onclick="toggleAccordion(this)">Y-axis 1</h3>
+            <div class="accordion-content">
+                <div class="axis-option toggle-option">
+                    <label>Show</label>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="axis-option toggle-option">
+                    <label>Opposite</label>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="axis-option toggle-option">
+                    <label>Reversed</label>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="axis-option">
+                    <label for="masking">Masking</label>
+                    <input type="text" id="masking" placeholder="{value}" class="input-mask">
+                </div>
+                <div class="axis-option">
+                    <label>Left Offset</label>
+                    <input type="range" id="left-offset" min="0" max="100" value="0">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="left-offset-display">0</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Lowest Val</label>
+                    <div class="value-control">
+                        <button class="decrement">-</button>
+                        <input type="text" value="0" class="value-input">
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Highest Val</label>
+                    <div class="value-control">
+                        <button class="decrement">-</button>
+                        <input type="text" value="100" class="value-input">
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Tick Amount</label>
+                    <input type="range" id="tick-amount" min="0" max="100" value="5">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="tick-amount-display">5</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <button class="axis-expand">Y-axis Labels</button>
+                <button class="axis-expand">Y-axis Title</button>
+                <button class="axis-expand">Axis Ticks</button>
+                <button class="axis-expand">Axis Border</button>
+            </div>
+        </div>
+
+        <!-- Grid Lines -->
+        <div class="axis-settings">
+            <h3 class="accordion-header" onclick="toggleAccordion(this)">Grid Lines</h3>
+            <div class="accordion-content">
+                <div class="axis-option toggle-option">
+                    <label>Show</label>
+                    <label class="switch">
+                        <input type="checkbox" id="grid-lines-show" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="axis-option">
+                    <label for="grid-placement">Grid placement</label>
+                    <select id="grid-placement">
+                        <option value="back">back</option>
+                        <option value="front">front</option>
+                    </select>
+                </div>
+                <div class="axis-option">
+                    <label>Line Dash</label>
+                    <input type="range" id="line-dash" min="0" max="10" value="0">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="line-dash-value">0</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Gridlines Color</label>
+                    <input type="color" id="gridlines-color" value="#ffffff">
+                </div>
+                <div class="axis-option">
+                    <label>Grid Row Colors</label>
+                    <div class="color-box">
+                        <button class="add-color">+</button>
+                        <button class="remove-color">🗑</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Grid Row Color Opacity</label>
+                    <input type="range" id="grid-row-opacity" min="0" max="1" step="0.1" value="0.5">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="grid-row-opacity-value">0.5</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Grid Column Colors</label>
+                    <div class="color-box">
+                        <button class="add-color">+</button>
+                        <button class="remove-color">🗑</button>
+                    </div>
+                </div>
+                <div class="axis-option">
+                    <label>Grid Column Color Opacity</label>
+                    <input type="range" id="grid-column-opacity" min="0" max="1" step="0.1" value="0.5">
+                    <div class="offset-value">
+                        <button class="decrement">-</button>
+                        <span id="grid-column-opacity-value">0.5</span>
+                        <button class="increment">+</button>
+                    </div>
+                </div>
+                <div class="axis-option toggle-option">
+                    <label>Show X-axis lines</label>
+                    <label class="switch">
+                        <input type="checkbox" id="show-x-axis-lines">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="axis-option toggle-option">
+                    <label>Show Y-axis lines</label>
+                    <label class="switch">
+                        <input type="checkbox" id="show-y-axis-lines" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Padding -->
+        <div class="axis-settings">
+            <h3 class="accordion-header" onclick="toggleAccordion(this)">Grid Padding</h3>
+            <div class="accordion-content">
+                <div class="axis-option">
+                    <label>Top</label>
+                    <input type="range" id="padding-top" min="0" max="100" value="0">
+                    <div class="offset-value">
+                        <button class="decrement" data-target="padding-top">-</button>
+                        <span id="padding-top-value">0</span>
+                        <button class="increment" data-target="padding-top">+</button>
+                    </div>
+                </div>
+
+                <div class="axis-option">
+                    <label>Right</label>
+                    <input type="range" id="padding-right" min="0" max="100" value="25">
+                    <div class="offset-value">
+                        <button class="decrement" data-target="padding-right">-</button>
+                        <span id="padding-right-value">25</span>
+                        <button class="increment" data-target="padding-right">+</button>
+                    </div>
+                </div>
+
+                <div class="axis-option">
+                    <label>Bottom</label>
+                    <input type="range" id="padding-bottom" min="0" max="100" value="0">
+                    <div class="offset-value">
+                        <button class="decrement" data-target="padding-bottom">-</button>
+                        <span id="padding-bottom-value">0</span>
+                        <button class="increment" data-target="padding-bottom">+</button>
+                    </div>
+                </div>
+
+                <div class="axis-option">
+                    <label>Left</label>
+                    <input type="range" id="padding-left" min="0" max="100" value="15">
+                    <div class="offset-value">
+                        <button class="decrement" data-target="padding-left">-</button>
+                        <span id="padding-left-value">15</span>
+                        <button class="increment" data-target="padding-left">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </ul>
+
+    <!-- Yazı Tipi Seçenekleri -->
+    <ul id="fonts" class="sidebar-content" style="display:none;">
+        <li><a href="#">Yazı Tipi Seçeneği 1</a></li>
+        <li><a href="#">Yazı Tipi Seçeneği 2</a></li>
+    </ul>
+
+    <!-- Diğer Seçenekler -->
+    <ul id="options" class="sidebar-content" style="display:none;">
+        <li><a href="#">Seçenek 1</a></li>
+        <li><a href="#">Seçenek 2</a></li>
+    </ul>
+</div>
+
+<!-- Ana içerik alanı -->
+<div id="main-content">
+    <h3>Grafik Alanı</h3>
+    <div id="chart" class="chart-area">
+        <!-- Grafik buraya render edilecek -->
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
